@@ -117,86 +117,37 @@ Normalize our dataset.
 
 ```
 import pandas as pd
-
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score
 
-# Load Car Evaluation dataset
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/car/car.data"
 
-names = [
-    'buying',
-    'maint',
-    'doors',
-    'persons',
-    'lug_boot',
-    'safety',
-    'class'
-]
+car = pd.read_csv(url, header=None)
 
-car = pd.read_csv(url, names=names)
+X = car.iloc[:, :6].apply(LabelEncoder().fit_transform)
+y = LabelEncoder().fit_transform(car.iloc[:, 6])
 
-print(car.head())
-
-# Separate input features (X) and target (y)
-X = car.iloc[:, 0:6]
-y = car.iloc[:, 6]
-
-# Convert categorical input features into numerical values
-X = X.apply(LabelEncoder().fit_transform)
-
-# Convert target classes into numerical values
-le = LabelEncoder()
-y = le.fit_transform(y)
-
-print("\nClasses:")
-print(le.classes_)
-
-# Split dataset into training and testing data
 X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.25,
-    random_state=42
+    X, y, test_size=0.25, random_state=42
 )
 
-# Feature scaling
 scaler = StandardScaler()
-
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-# Create MLP classifier
 mlp = MLPClassifier(
     hidden_layer_sizes=(12, 13, 14),
-    activation='relu',
-    solver='adam',
     max_iter=2500,
     random_state=42
 )
 
-# Train the model
 mlp.fit(X_train, y_train)
 
-# Make predictions
 predictions = mlp.predict(X_test)
 
-print("\nPredicted Values:")
-print(predictions)
-
-# Confusion Matrix
-print("\nConfusion Matrix:")
-print(confusion_matrix(y_test, predictions))
-
-# Classification Report
-print("\nClassification Report:")
-print(classification_report(
-    y_test,
-    predictions,
-    target_names=le.classes_
-))
+print("Accuracy:", accuracy_score(y_test, predictions) * 100)
 ```
 <H3>Output:</H3>
 <img width="796" height="582" alt="image" src="https://github.com/user-attachments/assets/42df096a-c386-492d-b163-5f0fde9a307b" />
